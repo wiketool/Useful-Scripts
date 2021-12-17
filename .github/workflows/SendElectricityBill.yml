@@ -17,7 +17,7 @@ on:
 jobs:
   send-electricity-bill:
     runs-on: ubuntu-18.04
-    if: ${{ github.event.inputs.password }} == ${{ secrets.BOT_ACCESS_TOKEN }}
+    if: ${{ github.event.inputs.password }} == oOPS!
     strategy:
       matrix:
         python-version: [3.6]
