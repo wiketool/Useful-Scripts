@@ -13,9 +13,9 @@ def send(msg):
     delete_url = 'delete_msg'
     send_json = {
         'group_id': id,
-        'message': "当前剩余电费"+msg
+        'message': "当前剩余电费" + msg
     }
-    res = requests.post(url=domain, json=send_json, headers=headers)
+    res = requests.post(url=domain, json=send_json, headers=headers, proxies=None)
     print(res)
 
 
