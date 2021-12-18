@@ -3,6 +3,13 @@ name: SendElectricityBill
 on:
   push:
     branches: [ main ]
+      
+  workflow_dispatch:
+    inputs:
+      password:
+        description: 'ACCESS PASSWORD'
+        required: true
+        default: 'Oops'
     
   schedule:
   - cron: "0 0,4,10 * * *"
@@ -10,6 +17,7 @@ on:
 jobs:
   send-electricity-bill:
     runs-on: ubuntu-18.04
+    if: ${{ github.event.inputs.password }} == oOPS!
     strategy:
       matrix:
         python-version: [3.6]
@@ -35,6 +43,7 @@ jobs:
           ROOM: ${{ secrets.ROOM }}
           BOT_ACCESS_TOKEN: ${{ secrets.BOT_ACCESS_TOKEN }}
           BOTIP: ${{ secrets.BOTIP }}
+          GROUP: ${{ secrets.GROUP }}
         with:
           CLI_OPTS: ${{ secrets.CLI_OPTS }}
           RETRY: 2
@@ -43,4 +52,4 @@ jobs:
           # 先通链路再运行脚本
           SCRIPT: |
             curl -m 3 --retry 3 -s -o /dev/null http://10.100.1.24:8988/web/Common/Tsm.html
-            python Electricity-Spider/main.py "${{ secrets.DATA }}"
+            python SendElecToBot.py
