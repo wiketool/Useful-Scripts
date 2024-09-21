@@ -1,0 +1,31 @@
+ARG USER_ID
+ARG GROUP_ID
+
+# 第一阶段：构建应用依赖
+FROM python:3.12.6-slim AS builder
+WORKDIR /tmp
+# 安装Python依赖包
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 第二阶段：创建最终的镜像
+FROM python:3.12.6-slim
+WORKDIR /app
+ARG USER_ID
+ARG GROUP_ID
+RUN groupadd --gid ${GROUP_ID} appgroup
+RUN useradd --uid ${USER_ID} --gid ${GROUP_ID} appuser
+# 安装时区数据
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# 复制依赖和源代码
+COPY --from=builder /usr/local /usr/local
+COPY . /app
+USER appuser
+# 设置环境变量和其他配置
+CMD ["python", "main.py"]
